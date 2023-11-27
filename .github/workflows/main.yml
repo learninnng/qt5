@@ -35,16 +35,12 @@ jobs:
     - name: Configure Qt
       run: | 
         git submodule update --init --recursive
-        ./configure -opensource -confirm-license -nomake examples -nomake tests
+   
+    - name: Archive Repository
+      run: Compress-Archive -Path * -DestinationPath archive.zip  # Powershell命令用于压缩文件
 
-    - name: Build Qt
-      run: |
-        jom
-
-    - name: Package Artifacts
+    - name: Save Archive as Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: qt-build-windows
-        path: |
-          qtbase/bin
-          qtbase/lib
+        name: repository-archive
+        path: archive.zip
