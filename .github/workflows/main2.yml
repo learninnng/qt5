@@ -1,0 +1,48 @@
+name: Build Qt 5.15.2
+
+on:
+  push:
+    branches:
+      - main  # or any other branch where you want to run this workflow
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Qt 5.15.2 source
+      uses: actions/checkout@v2
+      with:
+        repository: 'qt/qt5'
+        ref: '5.15.2' # specify the branch
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x' # specify the Python version
+
+    - name: Install required tools
+      run: |
+        choco install perl
+        choco install jom
+
+    - name: Configure Qt
+      run: |
+        cd qt5
+        git submodule update --init --recursive
+        ./configure -opensource -confirm-license -nomake examples -nomake tests
+
+    - name: Build Qt
+      run: |
+        jom
+
+    - name: Package Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: qt-build-windows
+        path: |
+          qtbase/bin
+          qtbase/lib
